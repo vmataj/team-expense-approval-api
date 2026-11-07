@@ -6,7 +6,7 @@ import java.time.Instant;
 
 @Entity
 class Claim {
-    enum Status { PENDING, APPROVED, REJECTED }
+    enum Status { PENDING, APPROVED, REJECTED, WITHDRAWN }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

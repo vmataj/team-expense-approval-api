@@ -59,6 +59,27 @@ class ClaimWorkflowTest {
             .andReturn().getResponse().getStatus();
     }
 
+    @Test
+    void onlyTheSubmittingEmployeeCanWithdrawAPendingClaim() throws Exception {
+        mvc.perform(post("/api/claims").header("Authorization", credentials("employee"))
+                .contentType("application/json").content("""
+                    {"description":"Taxi fare","amount":18.50}
+                    """))
+            .andExpect(status().isCreated());
+        long id = repository.findByEmployeeOrderByIdDesc("employee").getFirst().id;
+        String path = "/api/claims/" + id + "/withdraw";
+        mvc.perform(get("/api/claims").header("Authorization", credentials("employee2")))
+            .andExpect(jsonPath("$.length()").value(0));
+        mvc.perform(post(path).header("Authorization", credentials("employee2")))
+            .andExpect(status().isNotFound());
+        mvc.perform(post(path).header("Authorization", credentials("manager")))
+            .andExpect(status().isForbidden());
+        mvc.perform(post(path).header("Authorization", credentials("employee")))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.history[1].action").value("WITHDRAWN"));
+        mvc.perform(post(path).header("Authorization", credentials("employee")))
+            .andExpect(status().isConflict());
+    }
+
     private String credentials(String username) {
         return "Basic " + Base64.getEncoder().encodeToString(
             (username + ":demo-pass").getBytes(StandardCharsets.UTF_8));

@@ -39,13 +39,30 @@ class ClaimController {
     @PostMapping("/{id}/decision")
     @Transactional
     ClaimView decide(@PathVariable long id, @Valid @RequestBody Decision input, Authentication actor) {
-        Claim claim = repository.lockById(id)
+        return close(findForUpdate(id), Claim.Status.valueOf(input.outcome().name()), actor.getName());
+    }
+
+    @PostMapping("/{id}/withdraw")
+    @Transactional
+    ClaimView withdraw(@PathVariable long id, Authentication actor) {
+        Claim claim = findForUpdate(id);
+        if (!claim.employee.equals(actor.getName())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return close(claim, Claim.Status.WITHDRAWN, actor.getName());
+    }
+
+    private Claim findForUpdate(long id) {
+        return repository.lockById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private ClaimView close(Claim claim, Claim.Status status, String actor) {
         if (claim.status != Claim.Status.PENDING) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Claim already decided");
         }
-        claim.status = Claim.Status.valueOf(input.outcome().name());
-        claim.decidedBy = actor.getName();
+        claim.status = status;
+        claim.decidedBy = actor;
         claim.decidedAt = Instant.now();
         return ClaimView.from(claim);
     }
