@@ -1,0 +1,8 @@
+body { margin: 0; background: #f2f0e8; color: #1f3027; font: 16px/1.6 system-ui, sans-serif; }
+main { max-width: 850px; margin: 5vh auto; padding: 28px; }
+h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.4rem); letter-spacing: -.05em; }
+.eyebrow { color: #466957; font-size: .8rem; letter-spacing: .15em; font-weight: 700; }
+form, article { background: #fffef8; border: 1px solid #d9dfd0; border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+button, input { border-radius: 7px; padding: 8px 10px; margin: 4px; font: inherit; border: 1px solid #77917e; }
+button { background: #29523c; color: white; cursor: pointer; }
+#status { font-family: monospace; }

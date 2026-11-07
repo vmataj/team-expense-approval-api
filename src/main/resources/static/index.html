@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Team Expense Approval</title><link rel="stylesheet" href="/style.css"></head>
+<body><main>
+<p class="eyebrow">OPERATIONS · FINANCE</p><h1>Team Expense Approval</h1>
+<p>Submit a fictional expense, record a decision, and inspect the audit history.</p>
+<form id="claim"><label>Description <input name="description" required maxlength="255" value="Train fare"></label>
+<label>Amount in EUR <input name="amount" type="number" step="0.01" min="0.01" required value="32.40"></label>
+<button>Submit as employee</button></form>
+<p id="status" role="status"></p><section id="claims" aria-label="Claims"></section>
+</main><script src="/demo.js"></script></body></html>
