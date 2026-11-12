@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: team-expense-approval-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: private
+      - key: SERVER_ADDRESS
+        value: 0.0.0.0
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=50
+      - key: SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE
+        value: "0"
+      - key: SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE
+        value: "3"
+      - key: SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT
+        value: "60000"
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false

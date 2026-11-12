@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:private-accounts;DB_CLOSE_DELAY=-1")
+@SpringBootTest(properties = "spring.datasource.url=${PRIVATE_TEST_JDBC_URL:jdbc:h2:mem:private-accounts;DB_CLOSE_DELAY=-1}")
 @AutoConfigureMockMvc
 @ActiveProfiles("private")
 class PrivateAccountTest {
