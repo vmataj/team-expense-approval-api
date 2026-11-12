@@ -4,10 +4,23 @@
 <body><main>
 <p class="eyebrow">OPERATIONS · FINANCE</p><h1>Team Expense Approval</h1>
 <p>Submit expenses, review claims, and inspect the audit history.</p>
-<label>Demo account <select id="actor"><option value="employee">Employee 1</option><option value="employee2">Employee 2</option><option value="manager">Manager</option></select></label>
+<section id="account-panel" hidden>
+<p id="account-status" role="status"></p>
+<a id="login" href="/login">Sign in</a>
+<form id="logout" action="/logout" method="post" hidden><input type="hidden" name="_csrf"><button>Sign out</button></form>
+<form id="signup" hidden>
+<h2>Create an account</h2>
+<label>Username <input name="username" required minlength="3" maxlength="40" pattern="[a-z0-9][a-z0-9_\-]{2,39}" autocomplete="username"></label>
+<label>Password <input type="password" name="password" required minlength="12" maxlength="72" autocomplete="new-password"></label>
+<button>Create account</button>
+</form>
+</section>
+<section id="claims-app" hidden>
+<label id="demo-account">Demo account <select id="actor"><option value="employee">Employee 1</option><option value="employee2">Employee 2</option><option value="manager">Manager</option></select></label>
 <label>Status <select id="filter"><option value="">All claims</option><option>PENDING</option><option>APPROVED</option><option>REJECTED</option><option>WITHDRAWN</option></select></label>
 <form id="claim"><label>Description <input name="description" required maxlength="255" value="Train fare"></label>
 <label>Amount in EUR <input name="amount" type="number" step="0.01" min="0.01" max="9999999999.99" required value="32.40"></label>
+<label id="reviewer-field" hidden>Reviewer username <input name="reviewer" disabled maxlength="40"></label>
 <button>Submit as employee</button></form>
 <p id="status" role="status"></p><section id="claims" aria-label="Claims"></section>
-</main><script src="/demo.js"></script></body></html>
+</section></main><script src="/account.js"></script><script src="/demo.js"></script></body></html>

@@ -12,6 +12,7 @@ class Claim {
     Long id;
     @Column(nullable = false)
     String employee;
+    String reviewer;
     @Column(nullable = false)
     String description;
     @Column(nullable = false, precision = 12, scale = 2)

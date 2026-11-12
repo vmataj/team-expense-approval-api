@@ -4,9 +4,15 @@ const filter = document.querySelector('#filter');
 const claims = document.querySelector('#claims');
 const statusLine = document.querySelector('#status');
 let view = 0;
+let session = null;
+
+function currentAccount() {
+    return session?.username ?? actor.value;
+}
 
 async function request(path, account, method = 'GET', payload) {
-    const headers = { Authorization: 'Basic ' + btoa(account + ':demo-pass') };
+    const headers = session ? { [session.csrfHeader]: session.csrfToken }
+        : { Authorization: 'Basic ' + btoa(account + ':demo-pass') };
     if (payload) headers['Content-Type'] = 'application/json';
     const response = await fetch('/api/claims' + path, {
         method, headers, body: payload && JSON.stringify(payload)
@@ -18,8 +24,8 @@ async function request(path, account, method = 'GET', payload) {
 
 async function refresh(message) {
     const active = ++view;
-    const account = actor.value;
-    form.hidden = account === 'manager';
+    const account = currentAccount();
+    form.hidden = !session && account === 'manager';
     claims.replaceChildren();
     statusLine.textContent = 'Loading claims…';
     try {
@@ -38,7 +44,8 @@ async function refresh(message) {
                 card.append(line);
             }
             if (claim.status === 'PENDING') {
-                const actions = account === 'manager'
+                const canReview = session ? claim.reviewer === account : account === 'manager';
+                const actions = canReview
                     ? [['Approve', '/decision', { outcome: 'APPROVED' }], ['Reject', '/decision', { outcome: 'REJECTED' }]]
                     : [['Withdraw', '/withdraw']];
                 for (const [label, path, payload] of actions) {
@@ -59,7 +66,7 @@ async function change(path, payload, message) {
     const controls = [actor, filter, ...form.elements, ...claims.querySelectorAll('button')];
     controls.forEach(control => { control.disabled = true; });
     try {
-        await request(path, actor.value, 'POST', payload);
+        await request(path, currentAccount(), 'POST', payload);
         filter.value = '';
         await refresh(message);
     } catch (error) {
@@ -75,4 +82,16 @@ form.addEventListener('submit', event => {
 });
 actor.addEventListener('change', () => refresh());
 filter.addEventListener('change', () => refresh());
-refresh();
+startAccount().then(account => {
+    session = account;
+    if (session) {
+        if (!session.username) return;
+        document.querySelector('#demo-account').hidden = true;
+        document.querySelector('#reviewer-field').hidden = false;
+        form.elements.reviewer.disabled = false;
+        form.elements.reviewer.required = true;
+        form.querySelector('button').textContent = 'Submit claim';
+    }
+    document.querySelector('#claims-app').hidden = false;
+    return refresh();
+}).catch(showAccountError);
