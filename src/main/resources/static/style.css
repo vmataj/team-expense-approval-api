@@ -1,8 +1,67 @@
-body { margin: 0; background: #f2f0e8; color: #1f3027; font: 16px/1.6 system-ui, sans-serif; }
-main { max-width: 850px; margin: 5vh auto; padding: 28px; }
-h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.4rem); letter-spacing: -.05em; }
-.eyebrow { color: #466957; font-size: .8rem; letter-spacing: .15em; font-weight: 700; }
-form, article { background: #fffef8; border: 1px solid #d9dfd0; border-radius: 14px; padding: 18px; margin-bottom: 14px; }
-button, input, select { border-radius: 7px; padding: 8px 10px; margin: 4px; font: inherit; border: 1px solid #77917e; }
-button { background: #29523c; color: white; cursor: pointer; }
-#status { font-family: monospace; }
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Chivo:wght@400;600;700&display=swap');
+
+:root {
+    --paper: #eaf3ee; --surface: #fff; --ink: #192b25; --muted: #435a4f;
+    --line: #b9cec2; --accent: #245b47; --on-accent: #fff;
+    --display: "Archivo Black", "Segoe UI", sans-serif;
+    font: 16px/1.55 "Chivo", "Segoe UI", sans-serif; color: var(--ink); background: var(--paper);
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+main { width: min(100% - 2rem, 72rem); margin-inline: auto; padding-bottom: 3rem; }
+a { color: var(--accent); text-underline-offset: .22em; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+h1, h2, h3, p { margin: 0 0 .75rem; }
+h1 { font: 700 clamp(2.3rem, 6vw, 4.5rem)/1.04 var(--display); letter-spacing: -.045em; }
+h2 { font: 700 clamp(1.45rem, 3vw, 2rem)/1.15 var(--display); }
+p, small { color: var(--muted); }
+.topbar, .account-nav, .section-head { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem 1rem; }
+.topbar, .section-head { justify-content: space-between; }
+.topbar { min-height: 4.8rem; padding-block: .85rem; border-bottom: 1px solid var(--line); }
+.wordmark { color: var(--ink); font-weight: 700; text-decoration: none; }
+.hero { padding: clamp(1.75rem, 5vw, 3.5rem) 0 1.4rem; }
+.hero p { max-width: 64ch; }
+label { display: grid; gap: .35rem; align-content: start; font-weight: 600; min-width: 0; }
+input, select, textarea, button, .button { font: inherit; padding: .55rem .8rem; min-height: 2.65rem; border: 1px solid var(--line); border-radius: .35rem; }
+input, select, textarea { color: var(--ink); background: var(--surface); max-width: 100%; min-width: 0; }
+button, .button { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700; cursor: pointer; }
+.button { display: inline-flex; align-items: center; text-decoration: none; }
+button:disabled { cursor: wait; opacity: .7; }
+form { margin: 0; }
+small { font-size: .85rem; font-weight: 400; }
+.sample-tag, .badge { display: inline-block; border-radius: 1rem; padding: .25rem .65rem; font-weight: 700; font-size: .82rem; background: var(--paper); color: var(--ink); }
+.preview-note .sample-tag { margin-right: .4rem; border: 1px solid var(--line); }
+.account-page main { max-width: 55rem; padding-top: clamp(1.25rem, 6vh, 4.5rem); }
+.back { display: inline-block; margin-bottom: 1.5rem; font-weight: 700; }
+.auth-layout { display: grid; grid-template-columns: .95fr 1fr; border: 1px solid var(--line); border-radius: .6rem; overflow: hidden; }
+.auth-intro, .auth-card { padding: clamp(1.4rem, 4vw, 3.5rem); }
+.auth-intro { background: var(--accent); color: var(--on-accent); }
+.auth-intro p { color: inherit; }
+.auth-intro h1 { font-size: clamp(2rem, 4.5vw, 3.5rem); }
+.auth-card { background: var(--surface); }
+.auth-card form { display: grid; gap: 1rem; }
+.auth-card button { margin-bottom: .75rem; }
+p[role="status"]:empty { display: none; }
+#account-feedback { font-weight: 600; }
+@media (max-width: 42rem) {
+    .auth-layout { grid-template-columns: 1fr; }
+    .topbar { min-height: auto; }
+}
+
+#claims-app { background: var(--surface); border: 1px solid var(--line); border-top: .4rem solid var(--accent); padding: clamp(1rem, 3vw, 2rem); }
+#claims-app > label { display: inline-grid; margin: 0 .7rem 1rem 0; }
+.claim-entry { display: grid; grid-template-columns: 1.3fr .7fr 1fr; gap: .8rem; align-items: start; padding: 1rem; background: var(--paper); margin-bottom: 1rem; }
+.claim-entry h3 { grid-column: 1 / -1; margin-bottom: 0; }
+.claim-entry button { justify-self: start; }
+.ledger-row { border-top: 1px solid var(--line); padding: 1rem 0; }
+.ledger-row:last-child { padding-bottom: 0; }
+.claim-summary { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: .45rem 1rem; margin-bottom: .45rem; }
+.claim-summary h3 { margin: 0; overflow-wrap: anywhere; }
+.claim-summary strong { font-variant-numeric: tabular-nums; }
+.ledger-row p { font-size: .9rem; margin: .3rem 0; }
+.ledger-row button { margin: .5rem .5rem 0 0; }
+.badge[data-status="PENDING"] { background: #f8edc9; color: #655019; }
+.badge[data-status="REJECTED"] { background: #f8e0df; color: #782f31; }
+@media (max-width: 42rem) { .claim-entry { grid-template-columns: 1fr; } .claim-summary { grid-template-columns: 1fr auto; } .claim-summary .badge { justify-self: start; } }

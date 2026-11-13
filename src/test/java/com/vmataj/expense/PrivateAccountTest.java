@@ -27,6 +27,12 @@ class PrivateAccountTest {
         var employeeToken = token(employee);
         var reviewerToken = token(reviewer);
         var outsiderToken = token(outsider);
+        mvc.perform(post("/api/claims").session(employee)
+                .header(employeeToken.csrfHeader(), employeeToken.csrfToken())
+                .contentType("application/json")
+                .content("{\"description\":\"Training ticket\",\"amount\":32.40,\"reviewer\":\"alice\"}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.detail").value("Enter the username of another registered reviewer. You cannot review your own claim."));
         byte[] claim = mvc.perform(post("/api/claims").session(employee)
                 .header(employeeToken.csrfHeader(), employeeToken.csrfToken())
                 .contentType("application/json").content("""

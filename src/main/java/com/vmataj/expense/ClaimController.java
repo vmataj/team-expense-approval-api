@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.core.Authentication;
@@ -46,7 +48,7 @@ class ClaimController {
         Claim claim = new Claim(actor.getName(), input.description(), input.amount());
         if (privateMode) {
             if (input.reviewer() == null || input.reviewer().equals(actor.getName()) || !users.userExists(input.reviewer())) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Choose another registered reviewer");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter the username of another registered reviewer. You cannot review your own claim.");
             }
             claim.reviewer = input.reviewer();
         }
@@ -92,6 +94,24 @@ class ClaimController {
     record Submission(@NotBlank @Size(max = 255) String description,
                       @NotNull @DecimalMin("0.01") @Digits(integer = 10, fraction = 2) BigDecimal amount,
                       @Pattern(regexp = "[a-z0-9][a-z0-9_-]{2,39}") String reviewer) {}
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ProblemDetail invalidSubmission(MethodArgumentNotValidException error) {
+        String field = error.getBindingResult().getFieldErrors().stream()
+            .findFirst().map(entry -> entry.getField()).orElse("");
+        String message = switch (field) {
+            case "description" -> "Enter a description between 1 and 255 characters.";
+            case "amount" -> "Enter an amount of at least €0.01 with up to two decimal places.";
+            case "reviewer" -> "Enter a reviewer username using 3–40 lowercase letters, digits, underscores or hyphens.";
+            default -> "Check the claim details and try again.";
+        };
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    ProblemDetail claimError(ResponseStatusException error) {
+        return error.getBody();
+    }
 
     enum Outcome { APPROVED, REJECTED }
     record Decision(@NotNull Outcome outcome) {}

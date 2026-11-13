@@ -9,18 +9,17 @@ import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @Profile("private")
 class PrivateSecurity {
     @Bean
     SecurityFilterChain privateAccess(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/style.css", "/demo.js", "/account.js", "/account", "/account/signup", "/error").permitAll()
+                .requestMatchers("/", "/login.html", "/signup.html", "/index.html", "/style.css", "/account.js", "/demo.js", "/account", "/account/signup", "/error").permitAll()
                 .anyRequest().authenticated())
-            .formLogin(login -> login.defaultSuccessUrl("/", true).permitAll())
-            .logout(withDefaults())
+            .formLogin(login -> login.loginPage("/login.html").loginProcessingUrl("/login")
+                .failureUrl("/login.html?error").defaultSuccessUrl("/", true).permitAll())
+            .logout(logout -> logout.logoutSuccessUrl("/"))
             .build();
     }
 

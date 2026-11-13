@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create account | Team Expense Approval</title><link rel="stylesheet" href="/style.css"><script defer src="/account.js"></script></head>
+<body class="account-page"><main>
+<a class="back" href="/">← Back to Team Expense Approval</a>
+<div class="auth-layout"><aside class="auth-intro"><p>Team Expense Approval</p><h1>Your expense ledger</h1><p>Submit expenses, review assigned claims, and track decisions.</p></aside>
+<section class="auth-card"><h2>Create account</h2>
+<form id="account-form" method="post" action="/account/signup" data-mode="signup">
+<input type="hidden" name="_csrf">
+<label>Username<input name="username" autocomplete="username" required pattern="[a-z0-9][a-z0-9_\-]{2,39}" maxlength="40"><small>Use 3–40 lowercase letters, numbers, underscores or hyphens. Start with a letter or number.</small></label>
+<label>Password<input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password"><small>Use at least 12 characters.</small></label>
+<button disabled>Create account</button>
+</form><p id="account-feedback" role="status"></p><p><a href="/login.html">Sign in</a></p></section></div>
+</main></body></html>

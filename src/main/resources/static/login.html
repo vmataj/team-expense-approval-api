@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in | Team Expense Approval</title><link rel="stylesheet" href="/style.css"><script defer src="/account.js"></script></head>
+<body class="account-page"><main>
+<a class="back" href="/">← Back to Team Expense Approval</a>
+<div class="auth-layout"><aside class="auth-intro"><p>Team Expense Approval</p><h1>Your expense ledger</h1><p>Submit expenses, review assigned claims, and track decisions.</p></aside>
+<section class="auth-card"><h2>Sign in</h2>
+<form id="account-form" method="post" action="/login" data-mode="login">
+<input type="hidden" name="_csrf">
+<label>Username<input name="username" autocomplete="username" required ></label>
+<label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+<button disabled>Sign in</button>
+</form><p id="account-feedback" role="status"></p><p><a href="/signup.html">Create an account</a></p></section></div>
+</main></body></html>
