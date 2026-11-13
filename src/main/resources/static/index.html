@@ -13,7 +13,7 @@
 <div class="section-head"><h2>Claims ledger</h2><span id="preview-label" class="sample-tag" hidden>Sample claims</span></div>
 <p id="preview-note" hidden>Filter the sample ledger below. Sign in to submit and review real claims.</p>
 <label id="demo-account">Demo account <select id="actor"><option value="employee">Employee 1</option><option value="employee2">Employee 2</option><option value="manager">Manager</option></select></label>
-<label>Status <select id="filter"><option value="">All claims</option><option>PENDING</option><option>APPROVED</option><option>REJECTED</option><option>WITHDRAWN</option></select></label>
+<label>Status <select id="filter"><option value="">All claims</option><option value="PENDING">Pending</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option><option value="WITHDRAWN">Withdrawn</option></select></label>
 <form id="claim" class="claim-entry" hidden><h3>New expense</h3><label>Description <input name="description" required maxlength="255" placeholder="e.g. Train fare"></label>
 <label>Amount in EUR <input name="amount" type="number" step="0.01" min="0.01" max="9999999999.99" required placeholder="32.40"></label>
 <label id="reviewer-field" hidden>Reviewer username <input name="reviewer" disabled maxlength="40" aria-describedby="reviewer-help"><small id="reviewer-help">Enter the username of another person who already has an account in this app.</small></label>
