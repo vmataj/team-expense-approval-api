@@ -1,6 +1,7 @@
 package com.vmataj.expense;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +19,54 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PrivateAccountTest {
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
+    @Autowired LedgerService ledger;
+
+    @Test
+    void personalExpensesAndBudgetsAreIsolated() throws Exception {
+        MockHttpSession owner = signupAndLogin("ledgerowner");
+        MockHttpSession visitor = signupAndLogin("ledgervisitor");
+        var ownerToken = token(owner);
+        var visitorToken = token(visitor);
+        String month = LocalDate.now().toString().substring(0, 7);
+        mvc.perform(get("/")).andExpect(forwardedUrl("/ledger.html"));
+        mvc.perform(get("/api/ledger").param("month", month)).andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/ledger/entries").session(owner)
+                .header(ownerToken.csrfHeader(), ownerToken.csrfToken()).contentType("application/json")
+                .content("""
+                    {"description":"Metro pass","amount":"22.40","category":"TRANSPORT","spentOn":"%s"}
+                    """.formatted(LocalDate.now())))
+            .andExpect(status().isCreated());
+        mvc.perform(put("/api/ledger/budgets/" + month + "/TRANSPORT").session(owner)
+                .header(ownerToken.csrfHeader(), ownerToken.csrfToken()).contentType("application/json")
+                .content("{\"amount\":100}"))
+            .andExpect(status().isNoContent());
+        byte[] body = mvc.perform(get("/api/ledger").param("month", month).session(owner))
+            .andExpect(jsonPath("$.entries[0].amount").value(22.40))
+            .andExpect(jsonPath("$.budgets[0].amount").value(100))
+            .andReturn().getResponse().getContentAsByteArray();
+        String id = json.readTree(body).path("entries").get(0).path("id").asText();
+        mvc.perform(get("/api/ledger").param("month", month).session(visitor))
+            .andExpect(jsonPath("$.entries").isEmpty()).andExpect(jsonPath("$.budgets").isEmpty());
+        mvc.perform(delete("/api/ledger/entries/" + id).session(visitor)
+                .header(visitorToken.csrfHeader(), visitorToken.csrfToken()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void monthlySchedulePostsEachMonthOnceAndReturnsToTheOriginalDay() {
+        var january = LocalDate.of(2026, 1, 31);
+        var march = LocalDate.of(2026, 3, 31);
+        ledger.schedule("schedule-test", new RecurringExpense.Input("Hosting",
+            new java.math.BigDecimal("5.00"), LedgerEntry.Category.UTILITIES, january), january);
+        ledger.sync("schedule-test", march);
+        ledger.sync("schedule-test", march);
+        var current = ledger.month("schedule-test", java.time.YearMonth.from(march));
+        org.junit.jupiter.api.Assertions.assertEquals(java.util.List.of(march),
+            current.entries().stream().map(LedgerEntry.Row::spentOn).toList());
+        org.junit.jupiter.api.Assertions.assertEquals(java.util.List.of(LocalDate.of(2026, 2, 28)),
+            current.previous().stream().map(LedgerEntry.Row::spentOn).toList());
+        org.junit.jupiter.api.Assertions.assertEquals(LocalDate.of(2026, 4, 30), current.recurring().getFirst().nextDate());
+    }
 
     @Test
     void onlySubmitterAndAssignedReviewerCanSeeClaims() throws Exception {

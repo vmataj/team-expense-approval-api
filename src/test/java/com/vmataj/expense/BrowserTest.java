@@ -41,7 +41,7 @@ class BrowserTest {
 
     @Test
     void submitsAnExpenseAndFiltersTheLedger() {
-        browser.get(home());
+        browser.get(home() + "approvals");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#claim")));
         browser.findElement(By.name("description")).sendKeys("Airport rail fare");
         browser.findElement(By.name("amount")).sendKeys("32.40");
@@ -55,6 +55,23 @@ class BrowserTest {
 
     private String home() {
         return "http://127.0.0.1:" + port + "/";
+    }
+
+    @Test
+    void guestAddsAnExpenseAndFindsItAfterReload() {
+        browser.get(home());
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#summary article")));
+        click(By.id("add"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#editor[open] [name=description]")))
+            .sendKeys("Selenium groceries");
+        browser.findElement(By.cssSelector("#editor[open] [name=amount]")).sendKeys("23.40");
+        click(By.id("editor-submit"));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("editor")));
+        click(By.cssSelector("[data-page=expenses]"));
+        browser.navigate().refresh();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("entry-search"))).sendKeys("Selenium groceries");
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("expenses-body"), "Selenium groceries"));
+        assertEquals(1, browser.findElements(By.cssSelector("#expenses-body tr")).size());
     }
 
     private void click(By locator) {

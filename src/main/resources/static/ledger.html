@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Track expenses, set monthly budgets, and see where your money goes.">
+    <title>Spendline Expense Tracker</title>
+    <link rel="stylesheet" href="/ledger.css">
+    <script type="module" src="/ledger.js"></script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<aside class="sidebar">
+    <a href="#overview" class="brand"><span aria-hidden="true">▥</span><strong>Spendline<small>Expense tracker</small></strong></a>
+    <nav aria-label="Ledger navigation">
+        <a href="#overview" data-page="overview"><span aria-hidden="true">◫</span>Overview</a>
+        <a href="#expenses" data-page="expenses"><span aria-hidden="true">☷</span>Expenses</a>
+        <a href="#budgets" data-page="budgets"><span aria-hidden="true">◉</span>Budgets</a>
+        <a href="#recurring" data-page="recurring"><span aria-hidden="true">↻</span>Recurring</a>
+        <a href="#reports" data-page="reports"><span aria-hidden="true">≋</span>Reports</a>
+    </nav>
+    <a class="approval-link" href="/approvals">Team approvals <span aria-hidden="true">↗</span></a>
+</aside>
+<div class="workspace">
+    <header class="topbar">
+        <span id="mode">Sample ledger</span>
+        <div id="guest"><a href="/login.html">Sign in</a><a class="button outline" href="/signup.html">Create account</a></div>
+        <form id="account" method="post" action="/logout" hidden><span id="username"></span><input type="hidden" name="_csrf"><button class="outline">Sign out</button></form>
+    </header>
+    <main id="content" tabindex="-1">
+        <div class="heading">
+            <div><h1 id="title">Spending overview</h1><p id="subtitle">See where your money went this month.</p></div>
+            <button class="primary" id="add">＋ Add expense</button>
+        </div>
+        <div class="toolbar">
+            <label for="month">Month</label><input id="month" type="month" min="1000-02" max="9999-12" required>
+            <button id="currency-tool" class="outline">Currency converter</button>
+        </div>
+        <p id="status" role="status" hidden></p>
+        <section class="summary" id="summary" aria-label="Monthly summary"></section>
+        <div class="dashboard">
+            <section class="panel chart-panel" id="categories" aria-labelledby="categories-title">
+                <div class="panel-heading"><h2 id="categories-title">Spending by category</h2><span>EUR</span></div>
+                <div class="chart-layout"><div id="donut" class="donut" aria-hidden="true"><div><strong id="donut-total"></strong><small>Total spent</small></div></div><ul id="category-list"></ul></div>
+            </section>
+            <section class="panel" id="trend" aria-labelledby="trend-title">
+                <div class="panel-heading"><h2 id="trend-title">Spending through the month</h2><span>By day</span></div>
+                <canvas id="trend-plot" width="520" height="143" role="img" aria-label="Daily spending chart"></canvas>
+                <p class="muted plot-note" id="trend-detail"></p>
+            </section>
+            <section class="panel" id="budget-panel" aria-labelledby="budget-title">
+                <div class="panel-heading"><h2 id="budget-title">Category budgets</h2><button class="text-button" id="set-budget">Set a budget</button></div>
+                <div id="budget-list"></div>
+            </section>
+            <section class="panel" id="insight-panel" aria-labelledby="insight-title">
+                <div class="panel-heading"><h2 id="insight-title">Spending insights</h2></div>
+                <ul id="insight-list"></ul>
+            </section>
+            <section class="panel wide" id="expense-panel" aria-labelledby="expense-title">
+                <div class="panel-heading"><h2 id="expense-title">Recent expenses</h2><a id="view-expenses" href="#expenses">View all</a></div>
+                <div id="expense-controls" class="toolbar" hidden>
+                    <label>Filter <select id="category-filter"><option value="">All categories</option></select></label>
+                    <label class="filter-search">Search <input id="entry-search" type="search" placeholder="Search descriptions"></label>
+                </div>
+                <div class="table-scroll"><table id="expenses-table">
+                    <thead><tr><th scope="col">Expense</th><th scope="col">Category</th><th scope="col">Date</th><th scope="col">Amount</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+                    <tbody id="expenses-body"></tbody>
+                </table></div>
+                <p id="expenses-empty" class="empty" hidden></p>
+            </section>
+            <section class="panel wide" id="recurring-panel" aria-labelledby="recurring-title" hidden>
+                <div class="panel-heading"><div><h2 id="recurring-title">Monthly schedules</h2><p class="muted">Due expenses are added when you open the ledger.</p></div><button class="outline" id="new-rule">＋ Schedule expense</button></div>
+                <div id="recurring-list"></div>
+            </section>
+            <section class="panel wide" id="export-panel" aria-labelledby="export-title" hidden>
+                <div class="panel-heading"><div><h2 id="export-title">Monthly report</h2><p class="muted">Export the selected month’s itemized ledger.</p></div><button class="outline" id="export">Download CSV</button></div>
+            </section>
+        </div>
+    </main>
+</div>
+<dialog id="editor" aria-labelledby="editor-title">
+    <form id="editor-form">
+        <div class="panel-heading"><h2 id="editor-title"></h2><button id="editor-close" type="button" class="icon-button" aria-label="Close">×</button></div>
+        <div id="editor-fields"></div>
+        <p id="editor-status" role="status" hidden></p>
+        <div class="editor-actions"><button id="editor-cancel" type="button" class="outline">Cancel</button><button id="editor-submit" class="primary">Save</button></div>
+    </form>
+</dialog>
+<template id="entry-fields">
+    <label>Description<input name="description" maxlength="120" required placeholder="e.g. Weekend groceries"></label>
+    <div class="field-pair">
+        <label>Amount in EUR<input name="amount" type="number" min="0.01" max="9999999999.99" step="0.01" required></label>
+        <label>Date<input name="spentOn" type="date" required></label>
+    </div>
+    <label>Category<select name="category" required></select></label>
+    <details class="receipt">
+        <summary>Scan a receipt</summary>
+        <label>Receipt image<input type="file" name="receipt" accept="image/png,image/jpeg,image/webp"></label>
+        <p class="muted">English receipts. The image stays in your browser. Review the extracted details before saving.</p>
+        <button type="button" class="outline scan">Read receipt</button>
+        <p role="status" class="scan-status"></p>
+        <textarea class="receipt-text" rows="4" aria-label="Recognized receipt text" readonly hidden></textarea>
+    </details>
+</template>
+</body>
+</html>

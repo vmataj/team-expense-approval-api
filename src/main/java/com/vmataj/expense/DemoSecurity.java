@@ -18,7 +18,8 @@ class DemoSecurity {
     @Bean
     SecurityFilterChain security(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/index.html", "/demo.js", "/account.js", "/style.css", "/account", "/error").permitAll()
+                .requestMatchers("/", "/ledger.html", "/ledger.css", "/ledger.js", "/receipts.js", "/approvals",
+                    "/index.html", "/demo.js", "/account.js", "/style.css", "/account", "/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/claims").hasRole("EMPLOYEE")
                 .requestMatchers(HttpMethod.POST, "/api/claims/*/decision").hasRole("MANAGER")
                 .requestMatchers(HttpMethod.POST, "/api/claims/*/withdraw").hasRole("EMPLOYEE")
